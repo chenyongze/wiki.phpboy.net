@@ -1,0 +1,9 @@
+:!: Vous n'avez pas créé de barre de navigation. Faites-le en créant la page : LINK
+
+Une fois que vous avez créé cette page, ajoutez une liste de liens pour créer une arborescence de navigation, par ex. :
+
+<file>  
+* [[lien 1]]
+* [[lien 2]]
+* [[lien 3]]
+</file>

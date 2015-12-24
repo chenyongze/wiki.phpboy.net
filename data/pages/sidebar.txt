@@ -1,0 +1,3 @@
+{{NEWPAGE}}
+
+{{indexmenu>#1|js#bj-tango.png navbar dsort id#random}}

@@ -1,0 +1,902 @@
+====== 需求 ======
+
+由于全平台的产品线丰富，各应用都有支付的需求，而支付涉及一系列敏感密钥和流程，如支付宝、微信密钥key，支付创建订单、退款、查询订单、转账、对账、财务统计等。为了统一管理支付的所有密钥，节约其他应用程序开发时间及成本，有必要在平台内建立和完善支付网关或者支付中心应用。
+
+
+目前涉及支付需求的应用有：想拍就拍（O2O项目）、商城系统、证件照等。
+
+====== 概要设计 ======
+
+
+===== 支付中心支付时序图 =====
+[[文件:支付中心.jpg]]
+
+===== 支付宝支付时序图 =====
+[[文件:支付宝支付.jpg|900px]]
+
+===== 微信支付时序图 =====
+[[文件:微信支付.jpg|900px]]
+
+===== 第三方支付文档及SDK =====
+
+支付宝移动支付
+
+[http://pan.baidu.com/s/1bniASwR 支付宝钱包支付接口开发包2.0标准版接入与使用规则]
+
+[http://pan.baidu.com/s/1mg0904w 支付宝钱包支付接口开发包2.0标准版]
+
+支付宝移动支付SDK
+
+[http://pan.baidu.com/s/1kTGkBFD 支付宝钱包支付接口开发包2.0标准版(Android 3.0.1).zip]
+
+[http://pan.baidu.com/s/1i31v7md 支付宝钱包支付接口开发包2.0标准版(iOS 3.0.1).zip]
+
+支付宝批量退款
+
+[http://pan.baidu.com/s/1ntMmhyL 即时到账批量退款有密接口(refund_fastpay_by_platform_pwd)接入与使用规则.pdf]
+
+[http://pan.baidu.com/s/1mg8aZJa 即时到账批量退款有密接口(refund_fastpay_by_platform_pwd).pdf]
+
+[http://pan.baidu.com/s/1pJKkTEr 即时到账批量退款无密接口(refund_fastpay_by_platform_nopwd)接入与使用规则.pdf]
+
+[http://pan.baidu.com/s/1mgKrbs8 即时到账批量退款无密接口(refund_fastpay_by_platform_nopwd).pdf]
+
+支付宝订单支付查询
+
+[http://pan.baidu.com/s/1i3vpSpR 支付宝单笔支付查询接口(single_trade_query)1.2.pdf]
+
+支付宝商家服务
+
+[https://b.alipay.com/order/techService.htm 支付宝商家服务]
+
+支付宝技术支持
+
+[https://cshall.alipay.com/support/cate_question.htm?cateId=239656&pcateId=239544 支付宝技术支持]
+
+支付宝商户服务
+
+[https://app.alipay.com/container/web/enterpriseIndex.htm 支付宝商户服务]
+
+微信：https://pay.weixin.qq.com/wiki/doc/api/app.php?chapter=11_1
+
+[https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_1 微信公众号支付]
+
+[http://pan.baidu.com/s/1mgq0eUW 微信支付 wxpay-payment-api-v2.2.pdf]
+
+[http://pan.baidu.com/s/1mgH42es 微信支付 APP支付(IOS)接口文档V1.7.pdf]
+
+[http://pan.baidu.com/s/1jGtRU3k 微信支付 APP支付(Android)接口文档V1.7.pdf]
+
+[http://pan.baidu.com/s/1gd0dHKn 微信支付 APP支付(Android)接口文档V1.7.pdf]
+
+===== Server SDK接入说明 =====
+
+===== Client 接入说明 =====
+
+===== 关于渠道 =====
+
+==== 微信公众号 ====
+
+微信公众账号支付，只能用于微信内置浏览器内，而且只有服务号才能申请该支付功能。发起微信公众号支付，首先需要在微信公众平台进行相关的开发配置，然后需要获取到open_id用于发起交易。
+
+=== 开发配置=== 
+
+登陆微信公众平台 -> 微信支付 -> 开发配置，如：
+
+[[文件:微信公众号微信支付开发配置.jpg|900px]]
+
+注意在测试授权目录下使用测试微信ID来进行测试
+
+=== OAuth2.0网页授权=== 
+
+登陆微信公众平台 -> 开发者中心 -> 网页服务 -> 网页账号 -> 修改，如：
+
+[[文件:微信公众号Oauth2.0.jpg|600px]]
+
+=== JS安全域名=== 
+
+登陆微信公众平台 -> 公众号设置 -> 功能设置 -> 设置，如： 
+
+[[文件:JS安全域名.jpg|600px]]
+
+=== 获取openid=== 
+
+要发起支付请求，需要额外的参数 open_id (微信公众号授权用户唯一标识)，如果仅仅只需要获取openid，请按以下步骤获取：
+
+1.用户同意授权，获取code
+
+https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
+
+APPID 为微信公众号appid
+
+redirect_uri 授权后重定向的回调链接地址，请使用urlencode对链接进行处理 
+
+response_type=code 返回类型，请填写code 
+
+scope=snsapi_base 不弹出授权页面，直接跳转，只能获取用户openid
+
+state=STATE 重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值，最多128字节 
+
+wechat_redirect 必须带此参数 
+
+不弹出授权页面，页面将跳转至 redirect_uri/?code=CODE&state=STATE。若用户禁止授权，则重定向后不会带上code参数，仅会带上state参数redirect_uri?state=STATE 
+
+2.通过code换取网页授权access_token，同时获取到openid
+
+https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
+
+APPID 为微信公众号appid
+
+secret 公众号的appsecret
+
+code 填写第一步获取的code参数 
+
+grant_type 填写为authorization_code
+
+正确时返回的JSON数据包如下：
+
+ {
+   "access_token":"ACCESS_TOKEN",
+   "expires_in":7200,
+   "refresh_token":"REFRESH_TOKEN",
+   "openid":"OPENID",
+   "scope":"SCOPE",
+   "unionid": "o6_bmasdasdsad6_2sgVt7hMZOPfL"
+ }
+
+<font color="#FF0000">注意</font>：由于公众号的secret和获取到的access_token安全级别都非常高，必须只保存在服务器，不允许传给客户端。后续刷新access_token、通过access_token获取用户信息等步骤，也必须从服务器发起。
+
+
+====== 技术选型 ======
+
+===== 新技术调研 =====
+
+==== Yii1的问题 ====
+
+#2008年正式发布，从时间上来看比较陈旧
+#PHP语言特性限制在php-5.2，新的特性为了兼容php的低版本从而后续框架版本更新跟不上PHP语言本身的更新
+#不同模块或者不同路径类名重复，即不支持命名空间
+#代码规范不合理
+
+===升级到Yii2===
+
+#完全拥抱Composer
+#命名空间
+#匿名函数
+#数组短语法[...元素...] 用于取代 array(...元素...)
+#视图文件中的短格式 echo 标签 <?=，自 PHP 5.4 起总会被识别并且合法，无论 short_open_tag 的设置是什么，可以安全使用
+#SPL类和接口
+#延迟静态绑定
+#Traits
+#intl Yii 2.0 使用 PHP 扩展 intl 来支持国际化的相关功能
+#代码更加规范
+
+==== Yii2文档 ====
+
+=== Yii 2.0 权威指南 ===
+
+http://www.yiichina.com/doc/guide/2.0
+
+=== 升级PHP-5.5 ===
+
+#从 PHP 5.3.X 迁移到 PHP 5.4.X http://php.net/manual/zh/migration54.php
+#从 PHP 5.4.x 迁移到 PHP 5.5.x http://php.net/manual/zh/migration55.php
+
+从现有的PHP-5.3升级PHP-5.5，新项目无升级成本。
+
+=== Composer ===
+
+在后续的项目中慢慢的尝试通过Composer来管理PHP的依赖包
+
+=== 环境变量 ===
+
+通过php-fpm配置文件提供的env指令来指定应用运行环境，通过getenv()来获取当前应用运行环境，理由：
+
+#除研发同学自己的开发环境会通过docker，vagrant，一键环境安装包来部署环境外，其他服务器一旦采购就已经确定其用途，即手工配置一次php-fpm的env指令
+#docker的开发环境可将php-fpm.conf的环境变量配置为development
+#其思想是在PHP内部添加了一个配置项，就好比开发了一个扩展，扩展有一个运行时配置项来指定当前部署的环境
+
+<pre>
+<?php
+/**
+ * 入口文件
+ *
+ * Camera360支付网关Paygw
+ *
+ * @author xudianyang@camera360.com
+ * @copyright Chengdu pinguo Technology Co.,Ltd.
+ */
+$env    = getenv('environ') ? : 'product';
+$config = require(__DIR__ . '/../config/' . $env . '/web.php');
+
+require(__DIR__ . '/../vendor/autoload.php');
+require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
+
+(new yii\web\Application($config))->run();
+</pre>
+
+目前所有的项目至少有四套环境，development、newdev、product、testing，现有的做法是通过gethostname()来进行if else判断，代码臃肿，效率低下。
+
+===== MySQL =====
+
+支付中心涉及的数据很敏感和重要，在操作过程中会有多种事务需求，选择MySQL作为数据库系统。
+
+===== RabbitMQ =====
+
+由于支付中心需要整合全公司的应用项目支付需求，故在收到第三方支付的异步通知消息时，消息入队后再出队。一期可以考虑透明传递第三方的通知。
+
+===== 日志 =====
+
+其他应用系统和Paygw的交互，Paygw和第三方支付系统的交互过程中，一定要将原始请求的参数通过日志系统记录，便于排查定位问题。
+
+====== 数据结构 ======
+
+===== 商户表（biz）=====
+
+  CREATE TABLE `t_biz` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `name` varchar(128) DEFAULT '' COMMENT '商户名称 ',
+    `desc` varchar(1000) DEFAULT '' COMMENT '商户描述',
+    `pp_sign_rsa_public_key` varchar(512) DEFAULT '' COMMENT '商户业务系统公钥',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='商户数据表（包括配置的密钥）';
+
+===== 商户支付方式表（biz_pay）=====
+
+  CREATE TABLE `t_biz_pay` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `biz_id` bigint(20) unsigned NOT NULL COMMENT '商户ID',
+    `way` tinyint(3) unsigned NOT NULL COMMENT '支付方式',
+    `name` varchar(128) DEFAULT '' COMMENT '支付方式名称 ',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `keys` text NOT NULL COMMENT '支付方式对应的密钥信息，json_encode结果',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `id_way` (`biz_id`,`way`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='商户支持的支付方式表';
+
+===== 付款单表（pay）=====
+
+  CREATE TABLE `t_pay` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `biz_id` bigint(20) unsigned NOT NULL COMMENT '商户ID',
+    `out_trade_no` varchar(32) NOT NULL COMMENT '唯一交易号,如pp_1_15008295672657,pp_1是环境定义,之后是外部订单号',
+    `trade_no` varchar(255) DEFAULT NULL COMMENT '第三方支付提供的交易流水号',
+    `way` tinyint(3) unsigned NOT NULL COMMENT '支付方式,支付宝、微信等',
+    `user_id` varchar(30) NOT NULL COMMENT '用户ID',
+    `user_name` varchar(100) DEFAULT NULL COMMENT '用户名称',
+    `status` tinyint(3) unsigned NOT NULL COMMENT '支付状态',
+    `total_fee` bigint(20) unsigned NOT NULL COMMENT '总金额,单位为分',
+    `expire_second` int(10) unsigned NOT NULL COMMENT '经过多少秒后，订单过期',
+    `client_ip` varchar(255) DEFAULT '' COMMENT '目标用户ip',
+    `currency` VARCHAR(20) DEFAULT 'CNY' COMMENT '支付币种',
+    `subject` varchar(128) DEFAULT '' COMMENT '订单标题 ',
+    `body` varchar(128) DEFAULT '' COMMENT '订单正文',
+    `buyer_info` varchar(2048) DEFAULT NULL COMMENT '买家信息,没有固定格式,由对应的支付方式设置和转换',
+    `create_time` datetime NOT NULL COMMENT '支付创建时间',
+    `start_time` datetime NOT NULL COMMENT '开始付款时间',
+    `pay_time` datetime DEFAULT NULL COMMENT '支付成功时间',
+    `update_time` datetime NOT NULL COMMENT '修改时间',
+    `addinfo` text COMMENT '附件字段信息',
+    `refund_amount` bigint(20) DEFAULT NULL COMMENT '已退款金额',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `payid` (`pay_id`),
+    UNIQUE KEY `biz_id_out_tradeno_way` (`biz_id`, `out_trade_no`,`way`),
+    KEY `trade_no` (`trade_no`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='付款单表';
+
+===== 支付请求和响应日志表（biz_log）===== 
+
+  CREATE TABLE `t_biz_log` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `out_trade_no` varchar(30) NOT NULL COMMENT '唯一交易号,如pp_1_15008295672657,pp_1是环境定义,之后是外部订单号',
+    `type` VARCHAR(512) DEFAULT '' COMMENT '请求类型',
+    `request_time` datetime NOT NULL COMMENT '请求时间',
+    `response_time` datetime NULL COMMENT '响应时间',
+    `request` text NOT NULL COMMENT '原始请求参数',
+    `response` text DEFAULT NULL COMMENT '响应参数',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='支付请求和响应日志表（创建、退款、转账、查询等）';
+
+===== 第三方支付异步通知日志表（third_part_log）===== 
+
+  CREATE TABLE `t_third_part_log` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `out_trade_no` varchar(30) NOT NULL COMMENT '唯一交易号,如pp_1_15008295672657,pp_1是环境定义,之后是外部订单号',
+    `notify_type` varchar(100) DEFAULT '' COMMENT '异步通知类型',
+    `buyer_info` varchar(2048) DEFAULT NULL COMMENT '买家信息,没有固定格式,由对应的支付方式设置和转换',
+    `trade_no` varchar(255) DEFAULT NULL COMMENT '第三方支付提供的交易流水号',
+    `request_time` datetime NOT NULL COMMENT '请求时间',
+    `response_time` datetime NULL COMMENT '响应时间',
+    `request` text NOT NULL COMMENT '原始通知数据',
+    `response` text DEFAULT NULL COMMENT '响应参数',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`),
+    KEY `out_trade_no` (`out_trade_no`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='第三方支付请求和响应日志表';
+
+===== 异步通知业务方反馈表（notify_feedback）=====
+
+  CREATE TABLE `t_notify_feedback` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `biz_id` bigint(20) unsigned NOT NULL COMMENT '商户ID',
+    `out_trade_no` varchar(30) NOT NULL COMMENT '唯一交易号,如pp_1_15008295672657,pp_1是环境定义,之后是外部订单号',
+    `way` tinyint(3) unsigned NOT NULL COMMENT '支付方式,支付宝、微信等',
+    `notify_type` varchar(100) NOT NULL COMMENT '异步通知类型',
+    `trade_no` varchar(255) NOT NULL COMMENT '第三方支付提供的交易流水号',
+    `create_time` datetime NOT NULL COMMENT '通知创建时间',
+    `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+    `notify_content` text NOT NULL COMMENT '原始通知数据',
+    `feedback` text DEFAULT NULL COMMENT '反馈数据',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`),
+    KEY `out_trade_no` (`out_trade_no`),
+    KEY `biz_id_out_trade_no_way` (`biz_id`, `out_trade_no`, `way`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='异步通知业务方反馈表（包括支付异步通知,退款异步通知,转账异步通知等）';
+
+===== 退款记录表（refund）=====
+
+  CREATE TABLE `t_refund` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `biz_id` bigint(20) unsigned NOT NULL COMMENT '商户ID',
+    `user_id` varchar(30) NOT NULL COMMENT '用户ID',
+    `out_trade_no` varchar(30) NOT NULL COMMENT '唯一交易号,如pp_1_15008295672657,pp_1是环境定义,之后是外部订单号',
+    `out_refund_no` varchar(30) NOT NULL COMMENT '外部退款单号,如pp_1_15008295672657,pp_1是环境定义,之后是外部退款单号',
+    `trade_no` varchar(255) DEFAULT NULL COMMENT '第三方支付提供的交易流水号',
+    `user_name` varchar(30) NOT NULL COMMENT '用户名',
+    `status` tinyint(3) unsigned NOT NULL COMMENT '退款状态',
+    `refund_fee` bigint(20) unsigned NOT NULL COMMENT '退款总金额,单位为分',
+    `total_fee` varchar(45) DEFAULT NULL,
+    `way` tinyint(3) unsigned NOT NULL COMMENT '支付方式',
+    `reason` varchar(45) NOT NULL,
+    `refund_time` datetime DEFAULT NULL COMMENT '退款成功时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_time` datetime NOT NULL COMMENT '退款创建时间',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `refundid` (`refund_id`),
+    UNIQUE KEY `out_refund_no` (`out_refund_no`),
+    KEY `trade_no` (`trade_no`),
+    KEY `biz_id_out_trade_no_way` (`biz_id`, `out_trade_no`, `way`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='退款记录表';
+
+===== 退款批次表（refund_batch）=====
+
+  CREATE TABLE `t_refund_batch` (
+    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+    `biz_id` bigint(20) unsigned NOT NULL COMMENT '商户ID',
+    `batch_no` bigint(32) unsigned NOT NULL COMMENT '退款批次号',
+    `batch_num` smallint(3) unsigned NOT NULL COMMENT '退款批次数',
+    `detail_data` text NOT NULL COMMENT '详细数据',
+    `refund_date` datetime NOT NULL COMMENT '请求的退款时间',
+    `is_effect` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '是否启用',
+    `is_delete` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否删除',
+    PRIMARY KEY (`id`)
+  ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='退款批次表';
+
+======= 系统交互=======
+
+===== 协议 =====
+
+HTTPS POST
+
+===== 数据格式 =====
+
+JSON
+
+===== 签名 =====
+
+==== 待签名数据集 ====
+
+待签名数据集是一个键值对集合
+
+=== 待签名字符串生成方式 ===
+
+由待签名数据集的键值对，按照key=value的形式拼接，然后按照字母序排序成一个字符串数组，用字符'&'来连接这个数组，得到的字符串作为待签名字符串。
+
+=== RSA签名方式 ===
+
+签名方式：得到待签名字符串后，用私钥签名，得到的结果就是签名结果。
+
+验签方式：得到待签名字符串后，用公钥验证给出的签名是否正确。
+
+=== 签名使用 ===
+
+{| border=1
+|-
+!应用场景!!签名方!!验签方!!签名方式!!待签名数据集!!验证结果!!签名数据!!验签数据
+|-
+|api/pay/create请求参数防伪||其他应用||paygw||RSA||请求的POST参数中除pp_sign和pp_sign_type之外的所有参数||pp_sign||其他应用私钥||其他应用公钥
+|-
+|api/pay/create返回参数防伪||paygw||其他应用||RSA||返回数据中除pp_sign和pp_sign_type之外的所有参数||pp_sign||paygw支付私钥||paygw支付公钥
+|-
+|api/pay/query请求参数防伪||其他应用||paygw||RSA||请求的POST参数中除pp_sign和pp_sign_type之外的所有参数||pp_sign||其他应用私钥||其他应用公钥
+|-
+|api/pay/query返回参数防伪||paygw||其他应用||RSA||返回数据中除pp_sign和pp_sign_type之外的所有参数||pp_sign||paygw支付私钥||paygw支付公钥
+|-
+|api/refund/create请求参数防伪||其他应用||paygw||RSA||请求的POST参数中除pp_sign和pp_sign_type之外的所有参数||pp_sign||其他应用私钥||其他应用公钥
+|-
+|api/refund/create返回参数防伪||paygw||其他应用||RSA||返回数据中除pp_sign和pp_sign_type之外的所有参数||pp_sign||paygw支付私钥||paygw支付公钥
+|-
+|api/pay/notify返回参数防伪||paygw||其他应用||RSA||返回数据中除pp_sign和pp_sign_type之外的所有参数||pp_sign||paygw支付私钥||paygw支付公钥
+|}
+
+=== Paygw公钥 ===
+
+<pre>
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgJqx9mv2y4N0hEFHSnke/VavI
+sLndZRQxNedjIs+VP5k5XQNyqvRaZBGPgw/xolWmKd1+htlwuiJ3mNRUuJAURbFN
+DOONqlWXtDa7Uzf5G4dRqa+ZhUOofb4mGF/aR4ucyXVY4IXm6+cmDbrTxoeyc71a
+8AbcCDGLtH/suXOykwIDAQAB
+-----END PUBLIC KEY-----
+</pre>
+
+====== 代码 ======
+
+===== GIT =====
+
+https://github.com/PGWireless/Paygw
+
+==== 部署 ====
+
+=== PHP-5.5 ===
+
+=== 安装Composer ===
+
+  >curl -sS https://getcomposer.org/installer | php
+
+=== 安装paygw依赖包 ===
+
+  >cd paygw
+  >composer install
+
+====== 部署结构 ======
+
+[[文件:Camer360支付网关.jpg]]
+
+====== 监控 ======
+
+===== 与其他业务系统网络通信状况监控 =====
+
+由于支付网关接收了第三方支付系统的异步通知后，再通知其他业务系统，如果支付网关和其他业务系统在不同的机房，有可能网络通信不畅，或者丢包严重，需要及时通知业务系统相关负责人处理。
+
+==== 盟宝游戏 ====
+
+url：http://api.pay.cloud.linnyou.com/pay/notifyOrder
+
+预期响应：fail
+
+监控：每隔20s访问一次，连接3次访问失败告警。
+
+==== 想拍就拍 ====
+
+url：https://photobazaar.camera360.com/photoBazaar/payCallBack
+
+预期响应：{"data":[],"status":401,"message":"out_trade_no is required!","serverTime":1448355996.0754}
+
+监控：每隔20s访问一次，连接3次访问失败告警。
+
+备注：serverTime每次请求可能不一样。
+
+===== 错误日志监控 =====
+
+支付网关采用了Yii2，为了输出符合品果规范的日志，并对接日志系统，封装了基于Yii2 log组件的PG\log类库。
+
+日志级别：info,trace,notice,profile,warning,error
+
+日志规范：[http://wiki.pinguo.us:8011/index.php?title=应用日志规范 应用日志规范]
+
+监控：产生error,warning就应该报警。
+
+====== 支付API ======
+
+===== 支付方式（way）=====
+
+{| border=1
+|-
+!方式!!值
+|-
+|支付宝移动快捷支付||101
+|-
+|微信APP支付||201
+|-
+|微信公众号||202
+|}
+
+===== 商户（biz_id）=====
+
+通过在Paygw后台添加商户后返回，如：
+
+{| border=1
+|-
+!名称!!值
+|-
+|商城正式环境||1
+|-
+|商城开发测试||9
+|-
+|商城QA测试||8
+|-
+|想拍就拍正式环境||4
+|-
+|想拍就拍开发测试||2
+|-
+|想拍就拍QA测试||3
+|-
+|盟宝正式环境||7
+|-
+|盟宝开发测试||5
+|-
+|盟宝QA测试||6
+|}
+
+===== 支付订单状态（trade_status）=====
+{| border=1
+|-
+!状态!!值
+|-
+|未支付||101
+|-
+|已支付||201
+|-
+|已支付不可退款||202
+|-
+|交易不存在（第三方支付系统中）||301
+|-
+|未知状态||901
+|}
+
+===== 退款订单状态（refund_status）=====
+{| border=1
+|-
+!状态!!值
+|-
+|待处理||101
+|-
+|已处理||201
+|-
+|退款失败||301
+|-
+|退款成功||401
+|-
+|无退款||801
+|-
+|未知状态||901
+|}
+
+备注：
+
+支付宝退款需要批量申请去支付宝执行
+
+银行卡退款成功通知会很慢，1~3天左右，微信零钱支付的的退款结果在同步通知中已更新
+
+===== 创建支付订单 =====
+
+==== 历史 ====
+
+{| border=1
+|-
+!版本!!日期!!作者!!内容
+|-
+|1||2015-09-12||徐典阳||新增
+|}
+
+==== URL ====
+https://paygw.camera360.com/api/pay/create
+
+==== 参数 ====
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|biz_id||商户ID||见商户（biz_id）||int||否||
+|-
+|way||支付方式||见支付方式（way）||int||否||
+|-
+|out_trade_no||外部订单号||||string||否||
+|-
+|subject||订单标题||长度限制128字节，不超过42个汉字。||string||否||
+|-
+|body||订单正文||长度限制255字节||string||否||
+|-
+|total_fee||支付金额||大于0，单位为分||int||否||
+|-
+|expire_second||订单过期时间||相对当前时间，单位秒||int||否||
+|-
+|user_id||用户ID||||string||否||
+|-
+|user_name||用户名称||||string||是||
+|-
+|client_ip||实际支付IP||||string||否||
+|-
+|openid||微信openid||微信公众号支付时获取的openid，仅在微信公众号支付时传递||string||是||
+|-
+|pp_sign||签名||由业务方用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
+
+==== 返回 ====
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|errno||错误码||见错误码（errno）||int||否||
+|-
+|message||错误描述||见错误描述（message）||int||否||
+|-
+|data||业务数据||||int||否||
+|}
+
+成功时data字段说明
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|sdk||调用支付sdk所需参数||微信包含appid，noncestr，package，partnerid，prepayid，timestamp，sign字段；支付宝移动快捷支付包含order_info，sign，sign_type||string||否||
+|-
+|trade||交易相关信息||包含way，call_back_url，pp_sign，pp_sign_type等等||string||否||
+|}
+ 注：支付宝移动快捷方式 服务端拿到返回结构需要 将sign,sign_type 放入order_info元素中 再返回给客户端唤起支付;
+
+===== 支付异步通知 =====
+
+整合微信/支付宝的等所有第三方的异步通知，合并成同构的异步通知转发给其他应用系统。其他应用系统需要为paygw提供一个处理异步通知的url。在校验过参数后并处理完关键逻辑后，返回success
+
+==== 历史 ====
+
+{| border=1
+|-
+!版本!!日期!!作者!!内容
+|-
+|1||2015-09-12||徐典阳||新增
+|}
+
+==== 参数 ====
+paygw收到第三方异步通知后，参数都以POST方式传递，参数列表如下：
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|notify_id||通知ID||通知唯一标示||int||否||
+|-
+|notify_type||通知类型||支付异步通知：trade_status_sync||string||否||
+|-
+|notify_time||通知时间||格式为【yyyy-MM-dd HH:mm:ss】 ||string||否||
+|-
+|biz_id||商户ID||见商户（biz_id）||int||否||
+|-
+|way||支付方式||见支付方式（way）||int||否||
+|-
+|trade_no||支付流水号||支付宝对应trade_no，微信对应transaction_id||string||是||
+|-
+|trade_status||支付订单状态||见支付订单状（trade_status）||string||否||
+|-
+|pay_time||支付时间||格式为【yyyy-MM-dd HH:mm:ss】||string||是||
+|-
+|out_trade_no||外部订单号||||string||否||
+|-
+|total_fee||支付金额||大于0，单位为分||int||否||
+|-
+|user_id||用户ID||||string||否||
+|-
+|user_name||用户名称||||string||是||
+|-
+|pp_sign||签名||由业务方用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
+
+===== 退款 =====
+
+==== 历史 ====
+
+{| border=1
+|-
+!版本!!日期!!作者!!内容
+|-
+|1||2015-09-12||徐典阳||新增
+|}
+
+==== URL ====
+https://paygw.camera360.com/api/refund/create
+
+==== 参数 ====
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|way||支付方式||见支付方式（way）||int||否||
+|-
+|biz_id||商户ID||见商户（biz_id）||int||否||
+|-
+|out_trade_no||外部订单号||见支付方式（way）||int||否||
+|-
+|out_refund_no||外部退款单号||||string||否||
+|-
+|reason||退款原因||长度限制255字节||string||否||
+|-
+|total_fee||支付总金额||大于退款金额，单位为分||int||否||
+|-
+|refund_fee||退款金额||大于0，单位为分||int||否||
+|-
+|user_id||用户ID||||string||否||
+|-
+|user_name||用户名称||||string||是||
+|-
+|pp_sign||签名||由业务方用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
+
+==== 返回 ====
+
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|errno||错误码||见错误码（errno）||int||否||
+|-
+|message||错误描述||见错误描述（message）||int||否||
+|-
+|data||业务数据||||int||否||
+|}
+
+成功时data字段说明
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|refund_status||退款状态||见退款订单状态（refund_status）||int||否||
+|-
+|pp_sign||签名||由支付风头用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
+
+===== 退款异步通知 =====
+
+退款状态有变动，会向指定的其他应用业务地址发异步通知，通知内容以POST方式发送。业务对异步通知验签通过并处理完毕后需返回success。参数都以POST方式传递，参数列表如下：
+
+==== 历史 ====
+
+{| border=1
+|-
+!版本!!日期!!作者!!内容
+|-
+|1||2015-09-12||徐典阳||新增
+|}
+
+==== 参数 ====
+paygw收到第三方异步通知后，参数都以POST方式传递，参数列表如下：
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|notify_id||通知ID||通知唯一标示||int||否||
+|-
+|notify_type||通知类型||退款异步通知为“refund_status_sync”||string||否||
+|-
+|notify_time||通知时间||格式为【yyyy-MM-dd HH:mm:ss】 ||string||否||
+|-
+|biz_id||商户ID||见商户（biz_id）||int||否||
+|-
+|way||支付方式||见支付方式（way）||int||否||
+|-
+|trade_no||支付流水号||支付宝对应trade_no，微信对应transaction_id||string||是||
+|-
+|pay_time||支付时间||格式为【yyyy-MM-dd HH:mm:ss】||string||是||
+|-
+|out_trade_no||外部订单号||||string||否||
+|-
+|out_refund_no||退款单号||||string||否||
+|-
+|total_fee||支付金额||大于0，单位为分||int||否||
+|-
+|refund_fee||退款金额||大于0，单位为分||int||否||
+|-
+|refund_status||退款金额||见退款订单状态（refund_status）||int||否||
+|-
+|user_id||用户ID||||string||否||
+|-
+|user_name||用户名称||||string||是||
+|-
+|pp_sign||签名||由业务方用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
+
+===== 查询订单支付情况 =====
+
+==== 历史 ====
+
+{| border=1
+|-
+!版本!!日期!!作者!!内容
+|-
+|1||2015-09-12||徐典阳||新增
+|}
+
+==== URL ====
+https://paygw.camera360.com/api/pay/query
+
+==== 参数 ====
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|way||支付方式||见支付方式（way）||int||否||
+|-
+|biz_id||商户ID||见商户（biz_id）||int||否||
+|-
+|out_trade_no||外部订单号||见支付方式（way）||int||否||
+|-
+|pp_sign||签名||由业务方用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
+
+==== 返回 ====
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|errno||错误码||见错误码（errno）||int||否||
+|-
+|message||错误描述||见错误描述（message）||int||否||
+|-
+|data||业务数据||||int||否||
+|}
+
+查询成功时data字段说明
+
+{| border=1
+|-
+!字段!!含义!!说明!!类型!!是否为空!!默认
+|-
+|ret_code||查询返回码||0表示成功||int||否||
+|-
+|ret_msg||出错信息||||string||是||
+|-
+|trade_status||订单状态||见支付订单状态（trade_status）||int||否||
+|-
+|refund_status||订单退款状态||见支付订单退款状态（refund_status）||int||否||
+|-
+|way||支付方式||||int||否||
+|-
+|biz_id||商户ID||见商户（biz_id）||int||否||
+|-
+|out_trade_no||外部订单号||||string||否||
+|-
+|trade_no||支付交易号||||string||否||
+|-
+|total_fee||总金额||单位为分||int||否||
+|-
+|pp_sign||签名||由业务方用私钥加密生成||string||否||
+|-
+|pp_sign_type||签名方式||暂时只能为RSA||string||否||
+|}
