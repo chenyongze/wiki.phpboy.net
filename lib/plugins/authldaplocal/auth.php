@@ -32,18 +32,18 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
         global $config_cascade;
 
         if(!@is_readable($config_cascade['plainauth.users']['default'])) {
-          $this->success = false;
+            $this->success = false;
         } else {
             if(@is_writable($config_cascade['plainauth.users']['default'])) {
-            $this->cando['addUser']      = true;
-            $this->cando['delUser']      = true;
-            $this->cando['modLogin']     = true;
-            $this->cando['modGroups']    = true;
-          }
-          $this->cando['getUsers']      = true;
-          $this->cando['getGroups']     = true;
-          $this->cando['getUserCount']  = true;
-          $this->cando['logout']        = true;
+                $this->cando['addUser']      = true;
+                $this->cando['delUser']      = true;
+                $this->cando['modLogin']     = true;
+                $this->cando['modGroups']    = true;
+            }
+            $this->cando['getUsers']      = true;
+            $this->cando['getGroups']     = true;
+            $this->cando['getUserCount']  = true;
+            $this->cando['logout']        = true;
         }
         // ldap extension is needed
         if(!function_exists('ldap_connect')) {
@@ -74,9 +74,21 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
         if(empty($pass)) return false;
         if(!$this->_openLDAP()) return false;
 
+        if (strpos($user, '@camera360.com') !== false) {
+            $userFullName = explode('@', $user);
+            $user = $userFullName[0];
+        }
+
         // check if local user exists
         if($this->users === null) $this->_loadUserData();
-        if(!isset($this->users[$user])) return false;
+        if(!isset($this->users[$user])) {
+            $this->users[$user] = array(
+                'name' => $user,
+                'mail' => $user . '@camera360.com',
+                'grps' => array('user'),
+            );
+        }
+
 
         // indirect user bind
         if($this->getConf('binddn') && $this->getConf('bindpw')) {
@@ -173,6 +185,10 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
      * @return  array containing user data or false
      */
     public function getUserData($user, $requireGroups=true) {
+        if (strpos($user, '@camera360.com') !== false) {
+            $userFullName = explode('@', $user);
+            $user = $userFullName[0];
+        }
         return $this->_getUserData($user);
     }
 
@@ -333,40 +349,40 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
         global $conf;
         global $config_cascade;
 
-      // local user mustn't already exist
-      if($this->users === null) $this->_loadUserData();
-      if(isset($this->users[$user])) {
-      	msg('The user '.$user.' does already exist',-1);
-        return false;
-      }
-      // but the user must exist in LDAP
-      $info = $this->getUserData($user,true);
-      if(empty($info['dn'])) {
-        msg('The user '.$user.' does not exist in LDAP',-1);
-        return false;
-      }
-      // fetch real name and email and groups from LDAP
-      $name = $info['name'];
-      $mail = $info['mail'];
-      $pass = '';
-      $grps = array_merge($grps, $info['grps']);
+        // local user mustn't already exist
+        if($this->users === null) $this->_loadUserData();
+        if(isset($this->users[$user])) {
+            msg('The user '.$user.' does already exist',-1);
+            return false;
+        }
+        // but the user must exist in LDAP
+        $info = $this->getUserData($user,true);
+        if(empty($info['dn'])) {
+            msg('The user '.$user.' does not exist in LDAP',-1);
+            return false;
+        }
+        // fetch real name and email and groups from LDAP
+        $name = $info['name'];
+        $mail = $info['mail'];
+        $pass = '';
+        $grps = array_merge($grps, $info['grps']);
 
-      // set default group if no groups specified
-      if (!count($grps) and $conf['defaultgroup']) {
-        $grps[] = $conf['defaultgroup'];
-      }
+        // set default group if no groups specified
+        if (!count($grps) and $conf['defaultgroup']) {
+            $grps[] = $conf['defaultgroup'];
+        }
 
-      // prepare user line
-      $groups = join(',',$grps);
-      $userline = join(':',array($user,$pass,$name,$mail,$groups))."\n";
+        // prepare user line
+        $groups = join(',',$grps);
+        $userline = join(':',array($user,$pass,$name,$mail,$groups))."\n";
 
-      if (io_saveFile($config_cascade['plainauth.users']['default'],$userline,true)) {
-        $this->users[$user] = compact('pass','name','mail','grps');
-        return TRUE;
-      }
-      msg('The '.$config_cascade['plainauth.users']['default'].
-          ' file is not writable. Please inform the Wiki-Admin', -1);
-      return null;
+        if (io_saveFile($config_cascade['plainauth.users']['default'],$userline,true)) {
+            $this->users[$user] = compact('pass','name','mail','grps');
+            return TRUE;
+        }
+        msg('The '.$config_cascade['plainauth.users']['default'].
+            ' file is not writable. Please inform the Wiki-Admin', -1);
+        return null;
     }
 
     /**
@@ -505,7 +521,7 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
         return $out;
     }
 
-     /**
+    /**
      * Make LDAP filter strings.
      *
      * Used by auth_getUserData to make the filter
@@ -532,7 +548,7 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
         return $filter;
     }
 
-   /**
+    /**
      * Only valid pageid's (no namespaces) for usernames
      *
      * @param string $user
@@ -540,7 +556,8 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
      */
     public function cleanUser($user) {
         global $conf;
-        return cleanID(str_replace(':', $conf['sepchar'], $user));
+        return $user;
+        //return cleanID(str_replace(':', $conf['sepchar'], $user));
     }
 
     /**
@@ -752,7 +769,7 @@ class auth_plugin_authldaplocal extends DokuWiki_Auth_Plugin {
      * @return resource
      */
     protected function _ldapsearch($link_identifier, $base_dn, $filter, $scope = 'sub', $attributes = null,
-                         $attrsonly = 0, $sizelimit = 0) {
+                                   $attrsonly = 0, $sizelimit = 0) {
         if(is_null($attributes)) $attributes = array();
 
         if($scope == 'base') {
