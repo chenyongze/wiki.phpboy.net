@@ -29,7 +29,7 @@ class action_plugin_markdownextra extends DokuWiki_Action_Plugin {
        // Check for default view (in this case there is only 1 parsed text)
        // or check that the text parsed is the text being edited
        // (see: http://www.dokuwiki.org/devel:environment#text):
-       if($ACT != 'show' && $event->data != $TEXT) return true;
+       // if($ACT != 'show' && $event->data != $TEXT) return true;
        
        if ($this->getConf('frontmatter')){
            if (preg_match('/^---\s*\n(.*?\n?)^---\s*$\n?(.+)/sm',$event->data, $match)){

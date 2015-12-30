@@ -102,7 +102,7 @@ class syntax_plugin_markdownextra extends DokuWiki_Syntax_Plugin {
     function _internallinks($text)
     {
         $links = array();
-        if ( ! $text ) return $links;
+        if ( ! $text || ! trim($text)) return $links;
         $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->loadHTML($text);
         if ($nodes = $doc->getElementsByTagName('a')){
