@@ -32,7 +32,7 @@ class action_plugin_markdownextra extends DokuWiki_Action_Plugin {
        // if($ACT != 'show' && $event->data != $TEXT) return true;
        
        if ($this->getConf('frontmatter')){
-           if (preg_match('/^---\s*\n(.*?\n?)^---\s*$\n?(.+)/sm',$event->data, $match)){
+           if (preg_match('/---\s*\n(.*\n)*\s*---/sm',$event->data, $match)){
                $event->data = sprintf("%s<markdown>\n%s\n</markdown>", $match[1], $match[2]);
            }else{
                $event->data = "<markdown>\n".$event->data."\n</markdown>";
