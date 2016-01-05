@@ -494,7 +494,15 @@ function act_redirect($id,$preact){
  * @param array $opts id and fragment for the redirect and the preact
  */
 function act_redirect_execute($opts){
-    $go = wl($opts['id'],'',true);
+    global $INPUT;
+
+    $referer_do = $INPUT->str("referer_do");
+    if (strtolower($INPUT->server->str('REQUEST_METHOD')) == 'post' && !empty($referer_do)) {
+        $params = "do=" . $referer_do;
+    } else {
+        $params = '';
+    }
+    $go = wl($opts['id'],$params,true, "&");
     if(isset($opts['fragment'])) $go .= '#'.$opts['fragment'];
 
     //show it
