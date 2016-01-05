@@ -45,7 +45,7 @@ function html_login(){
     $form->startFieldset($lang['btn_login']);
     $form->addHidden('id', $ID);
     $form->addHidden('do', 'login');
-    $form->addHidden('referer_do', $INPUT['do']);
+    $form->addHidden('referer_do', $INPUT->str('do'));
     $form->addElement(form_makeTextField('u', ((!$INPUT->bool('http_credentials')) ? $INPUT->str('u') : ''), $lang['user'], 'focus__this', 'block'));
     $form->addElement(form_makePasswordField('p', $lang['pass'], '', 'block'));
     if($conf['rememberme']) {
