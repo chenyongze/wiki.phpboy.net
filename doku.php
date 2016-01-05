@@ -8,6 +8,9 @@
  * @global Input $INPUT
  */
 
+// 关掉错误直接输出
+ini_set('display_errors', '0');
+
 // update message version - always use a string to avoid localized floats!
 $updateVersion = "47.1";
 
