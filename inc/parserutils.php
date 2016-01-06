@@ -70,7 +70,8 @@ function p_wiki_xhtml($id, $rev='', $excuse=true,$date_at=''){
     $keep = $ID;
     $ID   = $id;
 
-    if($rev || $date_at){
+
+    if(true || $rev || $date_at){
         if(file_exists($file)){
             $ret = p_render('xhtml',p_get_instructions(io_readWikiPage($file,$id,$rev)),$info,$date_at); //no caching on old revisions
         }elseif($excuse){
@@ -539,20 +540,20 @@ function p_get_parsermodes(){
             $PARSER_MODES[$obj->getType()][] = "plugin_$p"; //register mode type
             //add to modes
             $modes[] = array(
-                    'sort' => $obj->getSort(),
-                    'mode' => "plugin_$p",
-                    'obj'  => $obj,
-                    );
+                'sort' => $obj->getSort(),
+                'mode' => "plugin_$p",
+                'obj'  => $obj,
+            );
             unset($obj); //remove the reference
         }
     }
 
     // add default modes
     $std_modes = array('listblock','preformatted','notoc','nocache',
-            'header','table','linebreak','footnote','hr',
-            'unformatted','php','html','code','file','quote',
-            'internallink','rss','media','externallink',
-            'emaillink','windowssharelink','eol');
+        'header','table','linebreak','footnote','hr',
+        'unformatted','php','html','code','file','quote',
+        'internallink','rss','media','externallink',
+        'emaillink','windowssharelink','eol');
     if($conf['typography']){
         $std_modes[] = 'quotes';
         $std_modes[] = 'multiplyentity';
@@ -561,22 +562,22 @@ function p_get_parsermodes(){
         $class = "Doku_Parser_Mode_$m";
         $obj   = new $class();
         $modes[] = array(
-                'sort' => $obj->getSort(),
-                'mode' => $m,
-                'obj'  => $obj
-                );
+            'sort' => $obj->getSort(),
+            'mode' => $m,
+            'obj'  => $obj
+        );
     }
 
     // add formatting modes
     $fmt_modes = array('strong','emphasis','underline','monospace',
-            'subscript','superscript','deleted');
+        'subscript','superscript','deleted');
     foreach($fmt_modes as $m){
         $obj   = new Doku_Parser_Mode_formatting($m);
         $modes[] = array(
-                'sort' => $obj->getSort(),
-                'mode' => $m,
-                'obj'  => $obj
-                );
+            'sort' => $obj->getSort(),
+            'mode' => $m,
+            'obj'  => $obj
+        );
     }
 
     // add modes which need files
@@ -752,9 +753,9 @@ function p_xhtml_cached_geshi($code, $language, $wrapper='pre') {
 
     $cache = getCacheName($language.$code,".code");
     $ctime = @filemtime($cache);
-    if($ctime && !$INPUT->bool('purge') &&
-            $ctime > filemtime(DOKU_INC.'vendor/composer/installed.json') &&  // libraries changed
-            $ctime > filemtime(reset($config_cascade['main']['default']))){ // dokuwiki changed
+    if(false && $ctime && !$INPUT->bool('purge') &&
+        $ctime > filemtime(DOKU_INC.'vendor/composer/installed.json') &&  // libraries changed
+        $ctime > filemtime(reset($config_cascade['main']['default']))){ // dokuwiki changed
         $highlighted_code = io_readFile($cache, false);
 
     } else {
@@ -764,6 +765,7 @@ function p_xhtml_cached_geshi($code, $language, $wrapper='pre') {
         $geshi->enable_classes();
         $geshi->set_header_type(GESHI_HEADER_PRE);
         $geshi->set_link_target($conf['target']['extern']);
+        $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
 
         // remove GeSHi's wrapper element (we'll replace it with our own later)
         // we need to use a GeSHi wrapper to avoid <BR> throughout the highlighted text
@@ -778,4 +780,3 @@ function p_xhtml_cached_geshi($code, $language, $wrapper='pre') {
         return $highlighted_code;
     }
 }
-

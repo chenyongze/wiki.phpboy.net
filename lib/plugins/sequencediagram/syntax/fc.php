@@ -73,7 +73,7 @@ class syntax_plugin_sequencediagram_fc extends DokuWiki_Syntax_Plugin {
             try {
                 preg_match('/<flowchartdiagram>(.*?)<\/flowchartdiagram>/s', $data[0], $erg);
                 $src = $renderer->_xmlEntities($erg[1]);
-                $text="<div class=\"flowchartdiagram\" style=\"overflow:auto;\">$src</div>";
+                $text="<div class=\"flowchartdiagram\" style=\"overflow: auto;margin: 0 auto;text-align: center;\">$src</div>";
                 $renderer->doc .= $text;
             } catch (Exception $e) {
                 $renderer->doc .= "<pre>".htmlentities($text)."\n".$e."</pre>";

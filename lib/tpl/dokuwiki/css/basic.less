@@ -20,9 +20,9 @@ body {
     padding: 0;
 }
 body {
-    font: normal 87.5%/1.4 Arial, sans-serif;
+    font: normal 100%/1.4 PingFang SC,Hiragino Sans GB,Microsoft Yahei,WenQuanYi Micro Hei,sans-serif;
     /* default font size: 100% => 16px; 93.75% => 15px; 87.5% => 14px; 81.25% => 13px; 75% => 12px */
-    -webkit-text-size-adjust: 100%;
+    /*-webkit-text-size-adjust: 100%;*/
 }
 
 
@@ -42,7 +42,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-weight: bold;
+    font-weight: 500;
     padding: 0;
     line-height: 1.2;
     clear: left; /* ideally 'both', but problems with toc */
@@ -89,7 +89,6 @@ p,
 ul,
 ol,
 dl,
-pre,
 table,
 hr,
 blockquote,
@@ -97,8 +96,14 @@ figure,
 details,
 fieldset,
 address {
-    margin: 0 0 1.4em 0; /* bottom margin = line-height */
     padding: 0;
+    line-height: 27px;
+}
+
+pre {
+    margin: 0 0 1.4em 0; /* bottom margin = line-height */
+    background: rgba(102, 128, 153, 0.05) none repeat scroll 0 0;
+    box-shadow: 0 1px 2px rgba(255, 255, 255, 0.1) inset, 45px 0 0 rgba(102, 128, 153, 0.05) inset, 0 1px 0 rgba(102, 128, 153, 0.05);
 }
 
 div,
@@ -115,6 +120,15 @@ ul,
 ol {
     padding: 0 0 0 1.5em;
 }
+
+pre ul, pre ol {
+    margin-left: 35px;
+    color: rgba(102, 128, 153, 0.4);
+    margin-bottom: 0;
+    margin-top: 0;
+    padding: 0;
+}
+
 [dir=rtl] ul,
 [dir=rtl] ol {
     padding: 0 1.5em 0 0;
@@ -124,6 +138,13 @@ li,
 dd {
     padding: 0;
     margin: 0 0 0 1.5em;
+    line-height: 27px;
+}
+
+pre li, pre dd {
+    padding-left: 15px;
+    margin: 0;
+    line-height: 20px;
 }
 [dir=rtl] li,
 [dir=rtl] dd {
@@ -239,7 +260,8 @@ hr {
     border-width: 1px 0;
     height: 0;
     text-align: center;
-    clear: both;
+    border-color: #cfcfcf;
+    border-style: none none dashed;
 }
 
 acronym,
@@ -258,7 +280,6 @@ mark {
     color: inherit;
 }
 
-pre,
 code,
 samp,
 kbd {
@@ -277,15 +298,31 @@ pre {
     word-wrap: normal;
     border: 1px solid @ini_border;
     border-radius: 2px;
-    box-shadow: inset 0 0 .5em @ini_border;
     padding: .7em 1em;
 }
 
 blockquote {
-    padding: 0 .5em;
-    border: solid @ini_border;
     border-width: 0 0 0 .25em;
+    border-left-style: solid;
+    border-left-width: 10px;
+    padding: 10px 15px;
+    background: rgba(102, 128, 153, 0.05) none repeat scroll 0 0;
+    border-color: #d6dbdf;
 }
+
+blockquote ul, blockquote ol {
+    margin: 0 0 10px 0px;
+    padding: 0;
+}
+
+blockquote ul, blockquote ol {
+    list-style: outside;
+}
+
+blockquote p {
+    margin: 0;
+}
+
 [dir=rtl] blockquote {
     border-width: 0 .25em 0 0;
 }
@@ -457,4 +494,8 @@ textarea[readonly] {
     cursor: auto;
     opacity: .5;
     background-color: #eee;
+}
+
+.diagram [fill="#ffffff"], .flowchartdiagram [fill="#ffffff"] {
+    fill: #f9f9f5;
 }
