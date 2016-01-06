@@ -100,7 +100,7 @@ class syntax_plugin_addnewpage extends DokuWiki_Syntax_Plugin {
             $form = '<div class="addnewpage">' . DOKU_LF
                 . DOKU_TAB . '<form name="addnewpage" method="get" action="' . DOKU_BASE . DOKU_SCRIPT . '" accept-charset="' . $lang['encoding'] . '">' . DOKU_LF
                 . DOKU_TAB . DOKU_TAB . $namespaceinput . DOKU_LF
-                . DOKU_TAB . DOKU_TAB . '<input class="edit" type="text" name="title" size="20" maxlength="255" tabindex="2" />' . DOKU_LF
+                . DOKU_TAB . DOKU_TAB . '<input class="edit" type="text" name="title" size="10" maxlength="255" tabindex="2" />' . DOKU_LF
                 . $newpagetemplateinput
                 . DOKU_TAB . DOKU_TAB . '<input type="hidden" name="do" value="edit" />' . DOKU_LF
                 . DOKU_TAB . DOKU_TAB . '<input type="hidden" name="id" />' . DOKU_LF

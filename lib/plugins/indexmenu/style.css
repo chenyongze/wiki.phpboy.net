@@ -16,8 +16,6 @@
 /* dtree properties. No need to change*/
 
 .dtree {
-    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    font-size: 11px;
     color: __text__;
     white-space: nowrap !important;
     word-wrap: normal !important;
@@ -102,10 +100,10 @@ div.dokuwiki div.indexmenu_list_themes {
 /*tocbullet property*/
 .dtree .indexmenu_tocbullet {
     position: absolute;
-    background: transparent url(images/toc_bullet.gif) no-repeat scroll;
+    background: transparent url(images/toc_bullet.gif) no-repeat scroll 0 4px;
     vertical-align: middle;
     width: 11px;
-    height: 11px;
+    height: 20px;
 }
 
 /*scrolling arrow property*/
