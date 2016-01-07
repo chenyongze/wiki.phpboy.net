@@ -636,12 +636,12 @@ class Doku_Renderer_xhtml extends Doku_Renderer {
         }
 
         if(is_null($language)) {
-            $this->doc .= '<pre class="'.$type.'">'.$this->_xmlEntities($text).'</pre>'.DOKU_LF;
+            $this->doc .= '<pre class="'.$type.' plain">'.$this->_xmlEntities($text).'</pre>'.DOKU_LF;
         } else {
             $class = 'code'; //we always need the code class to make the syntax highlighting apply
             if($type != 'code') $class .= ' '.$type;
 
-            $this->doc .= "<pre class=\"$class $language\">".p_xhtml_cached_geshi($text, $language, '').'</pre>'.DOKU_LF;
+            $this->doc .= "<pre class=\"$class $language linenums\">".p_xhtml_cached_geshi($text, $language, '').'</pre>'.DOKU_LF;
         }
 
         if($filename) {
