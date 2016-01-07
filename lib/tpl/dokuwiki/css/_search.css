@@ -95,7 +95,7 @@
     text-align: right;
 }
 .dokuwiki form.search div.ajax_qsearch strong {
-    display: block;
+    display: inline-block;
     margin-bottom: .3em;
 }
 .dokuwiki form.search div.ajax_qsearch ul {

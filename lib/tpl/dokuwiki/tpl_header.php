@@ -60,11 +60,11 @@ if (!defined('DOKU_INC')) die();
             <!-- SITE TOOLS -->
             <div id="dokuwiki__sitetools">
                 <h3 class="a11y"><?php echo $lang['site_tools']; ?></h3>
-                <?php tpl_searchform(); ?>
                 <div class="mobileTools">
                     <?php tpl_actiondropdown($lang['tools']); ?>
                 </div>
                 <ul>
+                    <li><?php tpl_searchform(); ?></li>
                     <?php
                     tpl_toolsevent('sitetools', array(
                         tpl_action('recent', true, 'li', true),
