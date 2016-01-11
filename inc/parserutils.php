@@ -71,7 +71,7 @@ function p_wiki_xhtml($id, $rev='', $excuse=true,$date_at=''){
     $ID   = $id;
 
 
-    if(true || $rev || $date_at){
+    if($rev || $date_at){
         if(file_exists($file)){
             $ret = p_render('xhtml',p_get_instructions(io_readWikiPage($file,$id,$rev)),$info,$date_at); //no caching on old revisions
         }elseif($excuse){
@@ -753,7 +753,7 @@ function p_xhtml_cached_geshi($code, $language, $wrapper='pre') {
 
     $cache = getCacheName($language.$code,".code");
     $ctime = @filemtime($cache);
-    if(false && $ctime && !$INPUT->bool('purge') &&
+    if($ctime && !$INPUT->bool('purge') &&
         $ctime > filemtime(DOKU_INC.'vendor/composer/installed.json') &&  // libraries changed
         $ctime > filemtime(reset($config_cascade['main']['default']))){ // dokuwiki changed
         $highlighted_code = io_readFile($cache, false);
