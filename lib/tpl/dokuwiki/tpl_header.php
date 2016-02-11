@@ -26,7 +26,7 @@ if (!defined('DOKU_INC')) die();
                 tpl_link(
                     wl(),
                     '<img src="'.$logo.'" ' . ' width="64" alt="" /> <span>'.$conf['title'].'</span>',
-                    'accesskey="h" title="品果知识共享平台"'
+                    'accesskey="h" title="PHPBoy专注Web架构N年"'
                 );
                 ?></h1>
             <?php if ($conf['tagline']): ?>

@@ -6,7 +6,7 @@
  * Date: Sun, 20 Dec 2015 22:27:09 +0800
  */
 
-$conf['title'] = '品果云端研发知识共享平台';
+$conf['title'] = 'PHPBoy专注Web架构N年';
 $conf['start'] = '首页';
 $conf['lang'] = 'zh';
 $conf['license'] = 'cc-by-sa';
