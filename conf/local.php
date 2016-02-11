@@ -9,14 +9,29 @@
 $conf['title'] = 'PHPBoy专注Web架构N年';
 $conf['start'] = '首页';
 $conf['lang'] = 'zh';
+$conf['sidebar'] = '工具:sidebar';
 $conf['license'] = 'cc-by-sa';
+$conf['savedir'] = '/data/web/txtdb/';
+$conf['tocminheads'] = '1';
+$conf['maxtoclevel'] = '5';
 $conf['useacl'] = 1;
+$conf['authtype'] = 'authldaplocal';
 $conf['superuser'] = '@admin';
-$conf['disableactions'] = 'register';
+$conf['manager'] = '@user';
+$conf['disableactions'] = 'index,register';
+$conf['fnencode'] = 'utf-8';
+$conf['locktime'] = 30*60;
+$conf['cachetime'] = 60*60*24*7;
+$conf['plugin']['numberedheadings']['startlevel'] = '1';
+$conf['plugin']['numberedheadings']['tailingdot'] = 1;
 $conf['plugin']['indexmenu']['defaultoptions'] = '{{indexmenu>:}}';
 $conf['plugin']['indexmenu']['only_admins'] = 1;
-$conf['plugin']['addnewpage']['addpage_exclude'] = '';
+$conf['plugin']['indexmenu']['hide_headpage'] = 0;
+$conf['plugin']['gallery']['image_width'] = 1280;
+$conf['plugin']['gallery']['image_height'] = 800;
+$conf['plugin']['gallery']['options'] = 'direct,lightbox';
 $conf['plugin']['markdownextra']['frontmatter'] = 1;
+$conf['plugin']['addnewpage']['addpage_exclude'] = '';
 $conf['tpl']['arctic-mbo']['hidesidebar'] = 'edit,recover,preview,draft,conflict,admin,media';
 
 // end auto-generated content
