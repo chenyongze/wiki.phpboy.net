@@ -887,7 +887,7 @@ class syntax_plugin_indexmenu_indexmenu extends DokuWiki_Syntax_Plugin {
             }
         } else {
             //sort by page name
-            sort($dirs);
+            rsort($dirs);
             //collect directories
             foreach($dirs as $dir) {
                 if(call_user_func_array($func, array(&$data, $base, $dir, 'd', $lvl, $opts))) {
