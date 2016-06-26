@@ -1,0 +1,7 @@
+base   duoshuo
+author Matt
+email  caijiamx@gmail.com
+date   2014-7-31
+name   duoshuo plugin
+desc   Duoshuo For Dokuwiki
+url    http://www.xbc.me
