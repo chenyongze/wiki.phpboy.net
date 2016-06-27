@@ -23,6 +23,15 @@ $showSidebar = $hasSidebar && ($ACT=='show');
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <?php echo tpl_favicon(array('favicon', 'mobile')) ?>
     <?php tpl_includeFile('meta.html') ?>
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?ca21fe58c434c48c561221e500938ca0";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
 </head>
 
 <body>
