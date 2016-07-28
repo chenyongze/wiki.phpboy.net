@@ -125,6 +125,7 @@ class helper_plugin_svgpureinsert extends DokuWiki_Plugin {
         if(!$width) $width = $default[0];
         if(!$height) $height = $default[0];
 
+        /*
         // fix the SVG to be autoscaling
         if($fix) {
             if(isset($attributes['viewbox'])) unset($attributes['viewbox']);
@@ -139,6 +140,7 @@ class helper_plugin_svgpureinsert extends DokuWiki_Plugin {
             $data = preg_replace('/<svg([^>]*)>/s', $svg, $data, 1);
             io_saveFile($file, $data);
         }
+        */
 
         return array(
             $width,
